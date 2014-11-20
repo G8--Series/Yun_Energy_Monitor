@@ -1,0 +1,63 @@
+/*
+  Running shell commands using Process class.
+
+ This sketch demonstrate how to run linux shell commands
+ using an Arduino Yún. It runs the wifiCheck script on the Linux side
+ of the Yún, then uses grep to get just the signal strength line.
+ Then it uses parseInt() to read the wifi signal strength as an integer,
+ and finally uses that number to fade an LED using analogWrite().
+
+ The circuit:
+ * Arduino Yún with LED connected to pin 9
+
+ created 12 Jun 2013
+ by Cristian Maglie
+ modified 25 June 2013
+ by Tom Igoe
+
+ This example code is in the public domain.
+
+ http://arduino.cc/en/Tutorial/ShellCommands
+
+ */
+
+#include <Process.h>
+#include <Console.h>
+
+int maximo=2-1;
+int intervalo = maximo;
+
+void setup() {
+  Bridge.begin();
+  Console.begin();
+
+  // Wait for Console port to connect
+  while (!Console);
+    pinMode(13, OUTPUT);
+}
+
+void loop() {
+  Process p;
+  // This command line runs the WifiStatus script, (/usr/bin/pretty-wifi-info.lua), then
+  // sends the result to the grep command to look for a line containing the word
+  // "Signal:"  the result is passed to this sketch:
+  p.begin("date");
+  p.addParameter("+%r");
+  p.run();
+  // do nothing until the process finishes, so you get the whole output:
+  while (p.running());
+
+  // Read command output. runShellCommand() should have passed "Signal: xx&":
+  while (p.available()) {
+    String result = p.readString();			// look for an integer			// set the brightness of LED on pin 9
+  //  Console.println(result);			// print the number as well
+  }
+  if (intervalo != 0) {
+    intervalo--;
+    digitalWrite(13, HIGH);
+   // Console.println(intervalo);
+  } else {
+    intervalo = maximo;
+    digitalWrite(13, LOW);
+  }
+}
